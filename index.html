@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyBook - Flight Reservation System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        /* NAVBAR */
+        nav {
+            background: #123c69;
+            color: white;
+            padding: 15px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #5dade2;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            color: #5dade2;
+        }
+
+        /* PAGES */
+        .page {
+            display: none;
+            padding: 40px 7%;
+            min-height: 80vh;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* HOME */
+        .hero {
+            min-height: 520px;
+            background: linear-gradient(
+                rgba(18, 60, 105, 0.85),
+                rgba(18, 60, 105, 0.85)
+            ),
+            url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=80");
+
+            background-size: cover;
+            background-position: center;
+            color: white;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: #1e88e5;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #1565c0;
+        }
+
+        /* CARDS */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #123c69;
+            margin-bottom: 10px;
+        }
+
+        /* HEADINGS */
+        .page-title {
+            text-align: center;
+            color: #123c69;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        /* FORMS */
+        .form-container {
+            background: white;
+            max-width: 700px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        /* FLIGHT CARDS */
+        .flight-card {
+            background: white;
+            margin-bottom: 20px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        .flight-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .flight-number {
+            color: #123c69;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .price {
+            color: #008000;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .flight-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f0f5fa;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        /* SEARCH */
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        /* TABLE */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #123c69;
+            color: white;
+        }
+
+        /* BOOKING */
+        .booking-result {
+            background: white;
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #123c69;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 768px) {
+
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .flight-info,
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<nav>
+    <div class="logo">✈ Sky<span>Book</span></div>
+
+    <ul>
+        <li><a onclick="showPage('home')">Home</a></li>
+        <li><a onclick="showPage('register')">Registration</a></li>
+        <li><a onclick="showPage('flights')">Flights</a></li>
+        <li><a onclick="showPage('search')">Search</a></li>
+        <li><a onclick="showPage('booking')">Book Flight</a></li>
+        <li><a onclick="showPage('mybooking')">My Booking</a></li>
+        <li><a onclick="showPage('about')">About</a></li>
+    </ul>
+</nav>
+
+
+<!-- HOME PAGE -->
+
+<section id="home" class="page active" style="padding:0;">
+
+    <div class="hero">
+
+        <h1>Flight Reservation System</h1>
+
+        <p>
+            Search, book and manage your flights easily.
+        </p>
+
+        <button class="btn" onclick="showPage('search')">
+            Search Flights
+        </button>
+
+    </div>
+
+    <div style="padding:40px 7%;">
+
+        <h2 class="page-title">
+            Our Services
+        </h2>
+
+        <div class="cards">
+
+            <div class="card">
+                <h3>👤 Passenger Registration</h3>
+                <p>Register passenger information securely.</p>
+            </div>
+
+            <div class="card">
+                <h3>✈ Flight Information</h3>
+                <p>View available flights, routes and timings.</p>
+            </div>
+
+            <div class="card">
+                <h3>🎫 Online Booking</h3>
+                <p>Reserve your preferred flight and seats.</p>
+            </div>
+
+            <div class="card">
+                <h3>📋 Booking Management</h3>
+                <p>View or cancel your reservation.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- REGISTRATION PAGE -->
+
+<section id="register" class="page">
+
+    <h2 class="page-title">
+        Passenger Registration
+    </h2>
+
+    <div class="form-container">
+
+        <form id="registrationForm">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="age" min="1" max="120" required>
+            </div>
+
+            <div class="form-group">
+                <label>Gender</label>
+
+                <select id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="phone" pattern="[0-9]{10}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="address" required>
+            </div>
+
+            <button class="btn" type="submit">
+                Register Passenger
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- FLIGHTS PAGE -->
+
+<section id="flights" class="page">
+
+    <h2 class="page-title">
+        Available Flights
+    </h2>
+
+    <div id="flightList"></div>
+
+</section>
+
+
+<!-- SEARCH PAGE -->
+
+<section id="search" class="page">
+
+    <h2 class="page-title">
+        Search Flights
+    </h2>
+
+    <div class="search-box">
+
+        <div class="search-grid">
+
+            <div>
+                <label>From</label>
+
+                <select id="searchFrom">
+                    <option value="">Any City</option>
+                    <option>Pune</option>
+                    <option>Mumbai</option>
+                    <option>Delhi</option>
+                    <option>Bangalore</option>
+                    <option>Hyderabad</option>
+                </select>
+            </div>
+
+            <div>
+                <label>To</label>
+
+                <select id="searchTo">
+                    <option value="">Any City</option>
+                    <option>Pune</option>
+                    <option>Mumbai</option>
+                    <option>Delhi</option>
+                    <option>Bangalore</option>
+                    <option>Hyderabad</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Sort By</label>
+
+                <select id="sortFlight">
+                    <option value="default">Default</option>
+                    <option value="priceLow">Price: Low to High</option>
+                    <option value="priceHigh">Price: High to Low</option>
+                    <option value="seats">Available Seats</option>
+                </select>
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="btn" onclick="searchFlights()">
+            Search Flights
+        </button>
+
+    </div>
+
+    <div id="searchResults"></div>
+
+</section>
+
+
+<!-- BOOKING PAGE -->
+
+<section id="booking" class="page">
+
+    <h2 class="page-title">
+        Flight Reservation
+    </h2>
+
+    <div class="form-container">
+
+        <form id="bookingForm">
+
+            <div class="form-group">
+
+                <label>Passenger ID</label>
+
+                <input
+                    type="text"
+                    id="passengerId"
+                    placeholder="Example: P1001"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Flight Number</label>
+
+                <select id="bookingFlight" required>
+                    <option value="">Select Flight</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Travel Date</label>
+
+                <input
+                    type="date"
+                    id="travelDate"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Number of Seats</label>
+
+                <input
+                    type="number"
+                    id="seatCount"
+                    min="1"
+                    max="10"
+                    value="1"
+                    required
+                >
+
+            </div>
+
+            <button class="btn" type="submit">
+                Confirm Reservation
+            </button>
+
+        </form>
+
+    </div>
+
+    <div id="bookingResult"></div>
+
+</section>
+
+
+<!-- MY BOOKING PAGE -->
+
+<section id="mybooking" class="page">
+
+    <h2 class="page-title">
+        My Bookings
+    </h2>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Passenger</th>
+                    <th>Flight</th>
+                    <th>Route</th>
+                    <th>Date</th>
+                    <th>Seats</th>
+                    <th>Total Fare</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="bookingTable"></tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- ABOUT PAGE -->
+
+<section id="about" class="page">
+
+    <h2 class="page-title">
+        About Flight Reservation System
+    </h2>
+
+    <div class="form-container">
+
+        <h3 style="color:#123c69;">
+            Project Overview
+        </h3>
+
+        <br>
+
+        <p>
+            The Flight Reservation System is a web-based application
+            designed to simplify flight searching, passenger registration,
+            flight booking and reservation management.
+        </p>
+
+        <br>
+
+        <h3 style="color:#123c69;">
+            Data Structures Used
+        </h3>
+
+        <br>
+
+        <ul style="line-height:2; margin-left:25px;">
+
+            <li>
+                <b>Array:</b> Stores flight and passenger records.
+            </li>
+
+            <li>
+                <b>Objects:</b> Stores individual flight and booking information.
+            </li>
+
+            <li>
+                <b>Searching:</b> Searches flights based on source and destination.
+            </li>
+
+            <li>
+                <b>Sorting:</b> Sorts flights according to fare and seat availability.
+            </li>
+
+            <li>
+                <b>Queue:</b> Waiting-list concept for unavailable seats.
+            </li>
+
+        </ul>
+
+        <br>
+
+        <h3 style="color:#123c69;">
+            Technologies
+        </h3>
+
+        <br>
+
+        <p>
+            HTML5, CSS3 and JavaScript
+        </p>
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <p>
+        © 2026 SkyBook Flight Reservation System
+    </p>
+
+</footer>
+
+
+<script>
+
+    /* ===============================
+       FLIGHT DATA
+    =============================== */
+
+    let flights = [
+
+        {
+            number: "AI101",
+            airline: "Air India",
+            from: "Pune",
+            to: "Delhi",
+            departure: "08:00 AM",
+            arrival: "10:15 AM",
+            price: 5500,
+            seats: 45
+        },
+
+        {
+            number: "6E202",
+            airline: "IndiGo",
+            from: "Mumbai",
+            to: "Bangalore",
+            departure: "11:30 AM",
+            arrival: "01:15 PM",
+            price: 4200,
+            seats: 38
+        },
+
+        {
+            number: "UK303",
+            airline: "Vistara",
+            from: "Delhi",
+            to: "Mumbai",
+            departure: "02:00 PM",
+            arrival: "04:10 PM",
+            price: 6100,
+            seats: 30
+        },
+
+        {
+            number: "AI404",
+            airline: "Air India",
+            from: "Pune",
+            to: "Mumbai",
+            departure: "05:30 PM",
+            arrival: "06:40 PM",
+            price: 2800,
+            seats: 25
+        },
+
+        {
+            number: "6E505",
+            airline: "IndiGo",
+            from: "Bangalore",
+            to: "Delhi",
+            departure: "07:00 PM",
+            arrival: "09:40 PM",
+            price: 5800,
+            seats: 42
+        },
+
+        {
+            number: "SG606",
+            airline: "SpiceJet",
+            from: "Mumbai",
+            to: "Hyderabad",
+            departure: "09:00 AM",
+            arrival: "10:40 AM",
+            price: 3500,
+            seats: 35
+        },
+
+        {
+            number: "AI707",
+            airline: "Air India",
+            from: "Hyderabad",
+            to: "Pune",
+            departure: "03:00 PM",
+            arrival: "04:30 PM",
+            price: 3900,
+            seats: 28
+        }
+
+    ];
+
+
+    /* ===============================
+       DATA STRUCTURES
+    =============================== */
+
+    let passengers = [];
+
+    let bookings = [];
+
+    // Queue data structure
+    let waitingQueue = [];
+
+
+    /* ===============================
+       PAGE NAVIGATION
+    =============================== */
+
+    function showPage(pageId) {
+
+        let pages = document.querySelectorAll(".page");
+
+        pages.forEach(function(page) {
+            page.classList.remove("active");
+        });
+
+        document.getElementById(pageId).classList.add("active");
+
+        window.scrollTo(0, 0);
+
+        if (pageId === "flights") {
+            displayFlights(flights);
+        }
+
+        if (pageId === "booking") {
+            loadFlightDropdown();
+        }
+
+        if (pageId === "mybooking") {
+            displayBookings();
+        }
+
+    }
+
+
+    /* ===============================
+       DISPLAY FLIGHTS
+    =============================== */
+
+    function displayFlights(data) {
+
+        let container = document.getElementById("flightList");
+
+        container.innerHTML = "";
+
+        if (data.length === 0) {
+
+            container.innerHTML =
+                "<p>No flights available.</p>";
+
+            return;
+        }
+
+        data.forEach(function(flight) {
+
+            container.innerHTML += `
+
+                <div class="flight-card">
+
+                    <div class="flight-top">
+
+                        <div>
+                            <div class="flight-number">
+                                ${flight.number}
+                            </div>
+
+                            <div>
+                                ${flight.airline}
+                            </div>
+                        </div>
+
+                        <div class="price">
+                            ₹${flight.price}
+                        </div>
+
+                    </div>
+
+                    <div class="flight-info">
+
+                        <div class="info-box">
+                            <b>From</b><br>
+                            ${flight.from}
+                        </div>
+
+                        <div class="info-box">
+                            <b>To</b><br>
+                            ${flight.to}
+                        </div>
+
+                        <div class="info-box">
+                            <b>Departure</b><br>
+                            ${flight.departure}
+                        </div>
+
+                        <div class="info-box">
+                            <b>Seats</b><br>
+                            ${flight.seats}
+                        </div>
+
+                    </div>
+
+                    <button
